@@ -1,7 +1,21 @@
+require('dotenv').config()
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const fruits = require('./models/fruits');
+const { connect, connection } = require('mongoose')
+//include the method-override package place this where you instructor places it
+const methodOverride = require('method-override');
+const fruitController = require('./controllers/fruitsController')
+
+//Database connection
+  // second if an option object, this is best practice. it lets us use the most up-to-date 
+connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+connection.once('open', ()=> {
+  console.log('connected to mongo!')
+})
 
 // View Engine Middleware Configure
 const reactViewsEngine = require('jsx-view-engine').createEngine();
@@ -13,41 +27,50 @@ app.set('views', './views');
 
 // Custom Middleware
 app.use(express.urlencoded({ extended: false }));
+
+  //METHOD OVERRIDE
+  //after app has been defined
+  //use methodOverride.  We'll be adding a query parameter to our delete form named _method
+  app.use(methodOverride('_method'));
+
+//this tells server to look for static assests in the public folder like css, imgs, or fonts
+//CSS file
+app.use(express.static('public'))
+//then we go to layout folder to have the style across the board
+
 app.use((req, res, next) => {
   console.log('Middleware running...');
   next();
 });
 
-// I.N.D.U.C.E.S
-// ==============
-// Index
-app.get('/fruits', (req, res) => {
-  console.log('Index Controller Func. running...');
-  res.render('fruits/Index', { fruits });
-});
 
-// New // renders a form to create a new fruit
-app.get('/fruits/new', (req, res) => {
-  res.render('fruits/New');
-});
+//cut the routs and pasted them into the controller
+//required it in above as router
+//tell the server to use this router bellow
 
-// Create // recieves info from new route to then create a new fruit w/ it
-app.post('/fruits', (req, res) => {
-  req.body.readyToEat = req.body.readyToEat === 'on';
-  fruits.push(req.body);
-  //console.log(fruits);
-  // redirect is making a GET request to whatever path you specify
-  res.redirect('/fruits');
-});
+//Routes
+  //when the client makes a request to fruits, the server will  redirect to the controller router come here
+app.use('/fruits', fruitController)
+// app.use('/vegetables', vegetablesController)
+//deleting the fruits word in the path in the vegetableController file bc this will replace it and go to the specific route
 
-// Show
-app.get('/fruits/:id', (req, res) => {
-  res.render('fruits/Show', {
-    //second param must be an object
-    fruit: fruits[req.params.id],
-    //there will be a variable available inside the jsx file called fruit, its value is fruits[req.params.indexOfFruitsArray]
-  });
-});
+
+//CATCH ALL ROUTE 
+//always at the end after all routes
+//if anything after the / in the path that doesn't match anything redirect to index
+app.get('/*', (req, res)=>{
+  // either to the index page immediately
+  // res.redirect('/fruits')
+  // or to specific and custom 404 page
+  res.send(`
+  <div>
+    404 THIS PAGE DOESN'T EXIT 
+    GO BACK TO <a>href="/fruits"> Fruits Page</a>
+    <br/>
+    GO BACK TO <a>href="/vegetables"> Vegetables Page</a>
+  </div>
+  `)
+})
 
 // Listen
 app.listen(PORT, () => {
