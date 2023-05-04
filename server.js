@@ -65,9 +65,9 @@ app.get('/*', (req, res)=>{
   res.send(`
   <div>
     404 THIS PAGE DOESN'T EXIT 
-    GO BACK TO <a>href="/fruits"> Fruits Page</a>
+    GO BACK TO <a href="/fruits"> Fruits Page</a>
     <br/>
-    GO BACK TO <a>href="/vegetables"> Vegetables Page</a>
+    GO BACK TO <a href="/vegetables"> Vegetables Page</a>
   </div>
   `)
 })
