@@ -67,10 +67,10 @@ app.get('/*', (req, res)=>{
     404 THIS PAGE DOESN'T EXIT 
     <br/>
     <br/>
-    GO BACK TO <a href="/fruits"> Fruits Page</a>
+    GO TO <a href="/fruits">FRUITS</a> PAGE
     <br/>
     <br/>
-    GO BACK TO <a href="/vegetables"> Vegetables Page</a>
+    GO TO <a href="/vegetables">VEGETABLES</a> PAGE
   </div>
   `)
 })
